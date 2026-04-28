@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ids-agent"
+version = "0.1.0"
+description = "Multi-agent system for ML-based Intrusion Detection System research and development"
+requires-python = ">=3.11"
+dependencies = [
+    # Core LLM
+    "anthropic>=0.40.0",
+    # Settings
+    "pydantic-settings>=2.0",
+    # Database
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    # Vector DB
+    "chromadb>=0.5",
+    # Embeddings (optional — swap for local model)
+    "openai>=1.0",                # used for text-embedding-3-large
+    # HTTP
+    "aiohttp>=3.9",
+    # ML / data
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "torch>=2.2",
+    "optuna>=3.6",
+    "joblib>=1.3",
+    # Reporting
+    "rich>=13.0",
+    "matplotlib>=3.8",
+    "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+xgboost = ["xgboost>=2.0"]
+ray = ["ray[tune]>=2.9"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "mypy>=1.9",
+    "ruff>=0.4",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ids_agent*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
