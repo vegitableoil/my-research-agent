@@ -18,31 +18,31 @@ Human decides WHAT.  Agents execute HOW.
 
 ```mermaid
 flowchart TD
-    H(["👤 Human"])
+    H(["Human"])
 
     subgraph LIT["① Literature Intelligence"]
         LA[Literature Search Agent]
-        HG1{{"Human Gate\n(approve / reject paper)"}}
+        HG1{{"Human Gate<br/>(approve / reject paper)"}}
         SUM[Summary Generator Agent]
         RAG_IDX[RAG Indexing Agent]
     end
 
     subgraph DEV["② Model Development"]
-        HG2{{"Human Gate\n(propose architecture)"}}
+        HG2{{"Human Gate<br/>(propose architecture)"}}
         CODEGEN[Architecture Codegen Agent]
         HPT[Hyperparameter Tuner Agent]
         CV[Code Verifier Agent]
     end
 
     subgraph BASE["③ Baseline Pipeline"]
-        HG3{{"Human Gate\n(select baseline)"}}
-        BL_LOC[Baseline Locator Agent\n(GitHub search)]
+        HG3{{"Human Gate<br/>(select baseline)"}}
+        BL_LOC["Baseline Locator Agent<br/>(GitHub search)"]
         BL_REP[Baseline Replicator Agent]
         BLV[Baseline Verifier Agent]
     end
 
     subgraph EVAL["④ Experiment & Evaluation"]
-        HG4{{"Human Gate\n(select dataset)"}}
+        HG4{{"Human Gate<br/>(select dataset)"}}
         DS[Dataset Manager Agent]
         TRAIN[Training Orchestrator Agent]
         METRICS[Evaluation Agent]
@@ -50,9 +50,9 @@ flowchart TD
     end
 
     subgraph INFRA["Shared Infrastructure"]
-        VECDB[(Vector DB\nRAG Store)]
-        RELDB[(Relational DB\nFindings & Results)]
-        ART[(Artifact Store\nCode / Weights / Plots)]
+        VECDB[("Vector DB<br/>RAG Store")]
+        RELDB[("Relational DB<br/>Findings & Results")]
+        ART[("Artifact Store<br/>Code / Weights / Plots")]
         TOOLS[Tool Registry]
     end
 
@@ -106,32 +106,32 @@ flowchart TD
 flowchart LR
     subgraph LiteratureSearchAgent
         direction TB
-        Q["Query Builder\n(filters: year, venue, keyword)"]
-        SRC["Source Connectors\narXiv · Semantic Scholar\nIEEE Xplore · ACM DL"]
-        DEDUP["Dedup & Rank\n(citation count, recency, relevance)"]
+        Q["Query Builder<br/>(filters: year, venue, keyword)"]
+        SRC["Source Connectors<br/>arXiv · Semantic Scholar<br/>IEEE Xplore · ACM DL"]
+        DEDUP["Dedup & Rank<br/>(citation count, recency, relevance)"]
         Q --> SRC --> DEDUP
     end
 
     subgraph SummaryGeneratorAgent
         direction TB
         PDF["PDF / HTML Parser"]
-        FIELDS["Structured Extraction\n• Novelty\n• System Design\n• Dataset & Preprocessing\n• Model Architecture\n• Performance Metrics\n• Limitations\n• Implications"]
+        FIELDS["Structured Extraction<br/>Novelty · System Design<br/>Dataset · Architecture<br/>Performance Metrics<br/>Limitations · Implications"]
         CITE["Citation Graph Builder"]
         PDF --> FIELDS --> CITE
     end
 
     subgraph RAGIndexingAgent
         direction TB
-        CHUNK["Chunker\n(section-aware)"]
-        EMB["Embedder\n(e.g. text-embedding-3-large)"]
-        IDX["Vector DB Upsert\n+ metadata filter schema"]
+        CHUNK["Chunker<br/>(section-aware)"]
+        EMB["Embedder<br/>(e.g. text-embedding-3-large)"]
+        IDX["Vector DB Upsert<br/>+ metadata filter schema"]
         CHUNK --> EMB --> IDX
     end
 
     LiteratureSearchAgent -->|"paper list"| HGate{{"Human Gate"}}
     HGate -->|"approved PDF"| SummaryGeneratorAgent
     SummaryGeneratorAgent -->|"chunks + metadata"| RAGIndexingAgent
-    SummaryGeneratorAgent -->|"summary record"| DB[(Findings DB)]
+    SummaryGeneratorAgent -->|"summary record"| DB[("Findings DB")]
 ```
 
 **Key tools exposed by this layer**
@@ -151,23 +151,23 @@ flowchart LR
 ```mermaid
 flowchart TD
     subgraph ArchitectureCodegenAgent
-        SPEC["Architecture Spec\n(human description / diagram)"]
-        RAG_CTX["RAG: relevant paper sections\n(retrieved from vector DB)"]
-        GEN["Code Generator\n(PyTorch / TF / sklearn)"]
+        SPEC["Architecture Spec<br/>(human description / diagram)"]
+        RAG_CTX["RAG: relevant paper sections<br/>(retrieved from vector DB)"]
+        GEN["Code Generator<br/>(PyTorch / TF / sklearn)"]
         UNIT["Unit Test Generator"]
         SPEC & RAG_CTX --> GEN --> UNIT
     end
 
     subgraph CodeVerifierAgent
-        STATIC["Static Analysis\n(pylint, mypy, bandit)"]
-        SHAPE["Shape / Dimension Checker\n(dry-run with dummy batch)"]
-        REVIEW["LLM Code Review\n(correctness, edge cases,\nsecurity, style)"]
-        STATIC & SHAPE & REVIEW --> VER_OUT["Verification Report\n(pass | fail + diff)"]
+        STATIC["Static Analysis<br/>(pylint, mypy, bandit)"]
+        SHAPE["Shape / Dimension Checker<br/>(dry-run with dummy batch)"]
+        REVIEW["LLM Code Review<br/>(correctness, edge cases, security)"]
+        STATIC & SHAPE & REVIEW --> VER_OUT["Verification Report<br/>(pass / fail + diff)"]
     end
 
     subgraph HyperparamTunerAgent
-        SPACE["Search Space Builder\n(from architecture + paper hints)"]
-        FRAMEWORK["HPO Script Generator\n(Optuna · Ray Tune · Hyperopt)"]
+        SPACE["Search Space Builder<br/>(from architecture + paper hints)"]
+        FRAMEWORK["HPO Script Generator<br/>(Optuna · Ray Tune · Hyperopt)"]
         BUDGET["Budget & Early-Stop Config"]
         SPACE & FRAMEWORK & BUDGET --> HPO_SCRIPT["hpo_config.py + sweep.py"]
     end
@@ -175,7 +175,7 @@ flowchart TD
     ArchitectureCodegenAgent -->|"code artefact"| CodeVerifierAgent
     CodeVerifierAgent -->|"pass"| HyperparamTunerAgent
     CodeVerifierAgent -->|"fail"| ArchitectureCodegenAgent
-    HyperparamTunerAgent -->|"HPO scripts"| ART[(Artifact Store)]
+    HyperparamTunerAgent -->|"HPO scripts"| ART[("Artifact Store")]
 ```
 
 ---
@@ -184,33 +184,33 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    HG3{{"Human Gate\n(baseline: RF / MLP / paper model)"}}
+    HG3{{"Human Gate<br/>(RF / MLP / paper model)"}}
 
     subgraph BaselineLocatorAgent
-        GHS["GitHub Search\n(paper title, author, keywords)"]
-        QUAL["Quality Check\n(stars, README, requirements,\nlast commit, test coverage)"]
+        GHS["GitHub Search<br/>(paper title, author, keywords)"]
+        QUAL["Quality Check<br/>(stars, README, last commit,<br/>requirements, test coverage)"]
         GHS --> QUAL
     end
 
     subgraph BaselineReplicatorAgent
-        PAPER_RAG["RAG: full paper text\n(architecture + impl details)"]
-        SCAFFOLD["Code Scaffolder\n(reproduce model from spec)"]
+        PAPER_RAG["RAG: full paper text<br/>(architecture + impl details)"]
+        SCAFFOLD["Code Scaffolder<br/>(reproduce model from spec)"]
         PAPER_RAG --> SCAFFOLD
     end
 
     subgraph BaselineVerifierAgent
-        PAPER_CTX["RAG: paper context\n(load paper-specific index)"]
-        ARCH_CHECK["Architecture Fidelity Check\n(layer count, dims, activations)"]
-        METRIC_SANITY["Metric Sanity Check\n(reproduce reported numbers ±δ)"]
-        PAPER_CTX & ARCH_CHECK & METRIC_SANITY --> BL_REPORT["Verification Report\n(pass | fail + annotation)"]
+        PAPER_CTX["RAG: paper context<br/>(paper-specific index)"]
+        ARCH_CHECK["Architecture Fidelity Check<br/>(layers, dims, activations)"]
+        METRIC_SANITY["Metric Sanity Check<br/>(reproduce reported numbers)"]
+        PAPER_CTX & ARCH_CHECK & METRIC_SANITY --> BL_REPORT["Verification Report<br/>(pass / fail + annotation)"]
     end
 
     HG3 -->|"paper model"| BaselineLocatorAgent
-    HG3 -->|"standard model\n(RF, MLP, …)"| STDLIB["stdlib_baselines.py\n(pre-built adapters)"]
+    HG3 -->|"standard model"| STDLIB["stdlib_baselines.py<br/>(pre-built adapters)"]
     BaselineLocatorAgent -->|"repo found"| BaselineVerifierAgent
     BaselineLocatorAgent -->|"not found"| BaselineReplicatorAgent
     BaselineReplicatorAgent --> BaselineVerifierAgent
-    BaselineVerifierAgent -->|"pass"| RELDB[(Baseline Registry DB)]
+    BaselineVerifierAgent -->|"pass"| RELDB[("Baseline Registry DB")]
     BaselineVerifierAgent -->|"fail"| BaselineReplicatorAgent
     STDLIB --> RELDB
 ```
@@ -226,37 +226,37 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph DatasetManagerAgent
-        DS_REG["Dataset Registry\n(NSL-KDD · CICIDS2017/18\nUNSW-NB15 · CIC-DDoS2019\nBOT-IoT · UNSW-IoT · custom)"]
-        PREPROC["Preprocessing Pipeline\n(normalise · encode · split\nclass-balance · feature select)"]
-        LOADER["DataLoader / tfdata Factory"]
+        DS_REG["Dataset Registry<br/>NSL-KDD · CICIDS2017/18<br/>UNSW-NB15 · CIC-DDoS2019<br/>BOT-IoT · UNSW-IoT · custom"]
+        PREPROC["Preprocessing Pipeline<br/>normalise · encode · split<br/>class-balance · feature select"]
+        LOADER["DataLoader / tf.data Factory"]
         DS_REG --> PREPROC --> LOADER
     end
 
     subgraph TrainingOrchestratorAgent
-        SCHED["Experiment Scheduler\n(proposed model + all baselines)"]
-        RUN["Training Runner\n(local GPU · SLURM · Ray cluster)"]
+        SCHED["Experiment Scheduler<br/>(proposed model + all baselines)"]
+        RUN["Training Runner<br/>local GPU · SLURM · Ray cluster"]
         CKPT["Checkpoint Manager"]
         SCHED --> RUN --> CKPT
     end
 
     subgraph EvaluationAgent
-        METRICS_CALC["IDS Metric Suite\n• Accuracy · Precision · Recall · F1\n• Detection Rate (DR)\n• False Alarm Rate (FAR)\n• ROC-AUC · PR-AUC\n• Per-class breakdown\n• Inference latency\n• Model size / FLOPS"]
-        STAT["Statistical Tests\n(McNemar · Wilcoxon)"]
+        METRICS_CALC["IDS Metric Suite<br/>Accuracy · Precision · Recall · F1<br/>Detection Rate · False Alarm Rate<br/>ROC-AUC · PR-AUC<br/>Latency · Model Size"]
+        STAT["Statistical Tests<br/>(McNemar · Wilcoxon)"]
         METRICS_CALC --> STAT
     end
 
     subgraph ComparisonReportAgent
         TABLE["LaTeX / Markdown Table Generator"]
-        PLOT["Plot Generator\n(ROC curves · confusion matrix\n· learning curves · radar chart)"]
-        NARR["Narrative Writer\n(LLM-generated analysis)"]
+        PLOT["Plot Generator<br/>ROC curves · Confusion matrix<br/>Learning curves · Radar chart"]
+        NARR["Narrative Writer<br/>(LLM-generated analysis)"]
         TABLE & PLOT & NARR --> REPORT_OUT["report.pdf + report.md"]
     end
 
     DatasetManagerAgent --> TrainingOrchestratorAgent
     TrainingOrchestratorAgent --> EvaluationAgent
     EvaluationAgent --> ComparisonReportAgent
-    ComparisonReportAgent --> ART[(Artifact Store)]
-    ComparisonReportAgent --> RELDB[(Results DB)]
+    ComparisonReportAgent --> ART[("Artifact Store")]
+    ComparisonReportAgent --> RELDB[("Results DB")]
 ```
 
 ---
@@ -282,7 +282,7 @@ stateDiagram-v2
     AwaitArchSpec --> CodeGeneration : spec received
     CodeGeneration --> CodeVerification : code generated
     CodeVerification --> HPOScriptGen : verification passed
-    CodeVerification --> CodeGeneration : failed (retry ≤ N)
+    CodeVerification --> CodeGeneration : failed (retry N)
     HPOScriptGen --> Idle : HPO scripts ready
 
     Idle --> AwaitBaselineChoice : human selects baseline
@@ -290,7 +290,7 @@ stateDiagram-v2
     BaselineLocate --> BaselineVerify : code found / replicated
     BaselineVerify --> BaselineReady : passed
     BaselineVerify --> BaselineReplicate : failed
-    BaselineReplicate --> BaselineVerify : re-attempt (≤ N)
+    BaselineReplicate --> BaselineVerify : re-attempt (N)
 
     Idle --> AwaitDatasetChoice : human selects dataset
     AwaitDatasetChoice --> DataPrep : choice received
@@ -309,28 +309,28 @@ All knowledge-intensive agents share a unified RAG layer.
 ```mermaid
 flowchart LR
     subgraph Ingestion
-        PDF_IN["PDF / HTML\nIngestion"]
-        SECTION["Section-Aware\nChunker\n(title / abstract /\nmethod / results)"]
-        EMB_MDL["Embedding Model\n(configurable)"]
+        PDF_IN["PDF / HTML Ingestion"]
+        SECTION["Section-Aware Chunker<br/>(title / abstract / method / results)"]
+        EMB_MDL["Embedding Model<br/>(configurable)"]
         PDF_IN --> SECTION --> EMB_MDL
     end
 
     subgraph VectorStore
-        VDB["Vector DB\n(Chroma · Weaviate\n· pgvector)"]
-        META["Metadata Filters\n(paper_id, year, venue,\ntopic_tag, section_type)"]
+        VDB["Vector DB<br/>(Chroma · Weaviate · pgvector)"]
+        META["Metadata Filters<br/>(paper_id, year, venue,<br/>topic_tag, section_type)"]
         VDB --- META
     end
 
     subgraph Retrieval
         QUERY["Query Encoder"]
-        HYBRID["Hybrid Search\n(dense + BM25 sparse)"]
-        RERANK["Cross-Encoder\nReranker"]
+        HYBRID["Hybrid Search<br/>(dense + BM25 sparse)"]
+        RERANK["Cross-Encoder Reranker"]
         QUERY --> HYBRID --> RERANK
     end
 
     EMB_MDL --> VDB
     VDB --> HYBRID
-    RERANK --> CONTEXT["Retrieved Context\n→ agent prompt"]
+    RERANK --> CONTEXT["Retrieved Context<br/>to agent prompt"]
 ```
 
 **Named RAG indices**
@@ -349,22 +349,22 @@ flowchart LR
 ```mermaid
 flowchart TD
     subgraph Databases
-        VECDB["Vector DB\n(semantic search / RAG)"]
-        RELDB["Relational DB\n(SQLite dev · PostgreSQL prod)\n\nTables:\n papers · summaries\n baselines · experiments\n metrics · artifacts"]
-        ART_STORE["Artifact Store\n(local fs · S3-compatible)\n\nNamespaces:\n /code /weights\n /plots /reports /hpo"]
+        VECDB["Vector DB<br/>(semantic search / RAG)"]
+        RELDB["Relational DB<br/>SQLite dev · PostgreSQL prod<br/>papers · summaries · baselines<br/>experiments · metrics · artifacts"]
+        ART_STORE["Artifact Store<br/>local fs · S3-compatible<br/>/code /weights /plots /reports /hpo"]
     end
 
     subgraph AgentInfra
-        TOOL_REG["Tool Registry\n(capability → handler map)"]
-        AGENT_REG["Agent Registry\n(name → class · config · version)"]
-        MSG_BUS["Message Bus\n(async events between agents)"]
-        CTX_MGR["Context Manager\n(per-run shared state dict)"]
+        TOOL_REG["Tool Registry<br/>(capability to handler map)"]
+        AGENT_REG["Agent Registry<br/>(name to class + config + version)"]
+        MSG_BUS["Message Bus<br/>(async events between agents)"]
+        CTX_MGR["Context Manager<br/>(per-run shared state dict)"]
     end
 
     subgraph HumanLoop
-        CLI_GATE["CLI Review Gate\n(approve · reject · comment)"]
-        WEB_GATE["Web Dashboard\n(optional · future)"]
-        NOTIF["Notification Service\n(email · Slack · webhook)"]
+        CLI_GATE["CLI Review Gate<br/>(approve · reject · comment)"]
+        WEB_GATE["Web Dashboard<br/>(optional · future)"]
+        NOTIF["Notification Service<br/>(email · Slack · webhook)"]
     end
 
     TOOL_REG & AGENT_REG --> MSG_BUS
